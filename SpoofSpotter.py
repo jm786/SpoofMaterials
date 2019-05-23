@@ -32,14 +32,16 @@ import string
 #Some static variables
 QUERY_NAME = "AMNHORG"
 SENT = 'false'
-BADIPs = [] 
+BADIPs = []
+hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip()
+hostnameB = subprocess.check_output(["ipcalc -b " + hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
 
 #Parser Starter
 parser = argparse.ArgumentParser(description='A tool to catch spoofed NBNS responses')
 
 #Required Flags
-parser.add_argument('-i', action="store", metavar='192.168.1.110', help='The IP of this host', required=True)
-parser.add_argument('-b', action="store", metavar='192.168.1.255', help='The Broadcast IP of this host', required=True)
+parser.add_argument('-i', action="store", metavar='10.1.10.1', help='The IP of this host', required=False, const=hostnameI, nargs='?', default=hostnameI)
+parser.add_argument('-b', action="store", metavar='10.1.10.255', help='The Broadcast IP of this host', required=False, const=hostnameB, nargs='?', default=hostnameB)
 
 #Optional Flags
 parser.add_argument('-f','-F', action="store", metavar='/home/nbns.log', help='File name to save a log file')
@@ -63,8 +65,8 @@ def randomword():
     length = random.randint(8,20)
     s = "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$%^&*()?"
     return "".join(random.sample(s,length))
-    
-    
+
+
 #Scapy broadcast packet creation
 pkt = IP(src=args.i,dst=args.b)/UDP(sport=137, dport='netbios_ns')/NBNSQueryRequest(SUFFIX="file server service",QUESTION_NAME=QUERY_NAME, QUESTION_TYPE='NB')
 
@@ -94,7 +96,7 @@ def sendEmail(REMAIL, ESERVER, IP, MAC):
     s.sendmail(me, [you], msg.as_string())
     s.quit()
     #Thanks Python Example Code
-    
+
     #Flag for preventing email spamming
     if not args.c:
         global SENT
@@ -163,9 +165,9 @@ def get_packet(pkt):
             NBNSLogger.critical('A spoofed NBNS response for %s was detected by %s at %s from host %s - %s\n' %(QUERY_NAME, args.i, str(now2), pkt.getlayer(IP).src, pkt.getlayer(Ether).src))
             #Seriously, I didn't test this with an actual syslog server, please let me know if this works for you
                         #if the respond flag is set, respond with x number of hashes
-        
+
         if args.spam:
-            target_attacker_IP = pkt.getlayer(IP).src 
+            target_attacker_IP = pkt.getlayer(IP).src
             print 'Sending 1000 hashes to %s'%(target_attacker_IP)
             for x in range(5):
                 #Sends SMB, FTP, and WWW Auth
@@ -176,11 +178,11 @@ def get_packet(pkt):
                     pathstr = '//%s/C$'%(target_attacker_IP)
                     ftpstr = 'ftp://%s:%s@%s'%(name, randomword(), target_attacker_IP)
                     wwwstr = 'http://%s:%s@%s/test'%(name, randomword(), target_attacker_IP)
-                    
+
                     #print("Sending %s %s" % (pathstr, randpass))
                     thread_name = "thread" + str(x)
                     thread_name = threading.Thread(target=auth_request,args=(randpass, pathstr, ftpstr, wwwstr))
-                    thread_name.start() 
+                    thread_name.start()
 
         if args.R:
             target_attacker_IP = pkt.getlayer(IP).src
@@ -191,13 +193,13 @@ def get_packet(pkt):
                 randpass = 'AMNHORG/%s%%%s'%(name, randomword())
                 pathstr = '//%s/C$'%(target_attacker_IP)
                 ftpstr = 'ftp://%s:%s@%s'%(name, randomword(), target_attacker_IP)
-                wwwstr = 'http://%s:%s@%s/test'%(name, randomword(), target_attacker_IP)                
-                
+                wwwstr = 'http://%s:%s@%s/test'%(name, randomword(), target_attacker_IP)
+
                 print("Sending %s %s" % (pathstr, randpass))
                 auth_request(randpass, pathstr, ftpstr, wwwstr)
 
         if args.honeyuser:
-            target_attacker_IP = pkt.getlayer(IP).src 
+            target_attacker_IP = pkt.getlayer(IP).src
             print 'Sending %d hashes to %s'%(int(args.honeyuser), target_attacker_IP)
             for x in range(0, int(args.honeyuser)):
                 #Sends SMB, FTP, and WWW Auth
@@ -205,7 +207,7 @@ def get_packet(pkt):
                 randpass = 'AMNHORG/%s%%%s'%(name, randomword())
                 pathstr = '//%s/C$'%(target_attacker_IP)
                 ftpstr = 'ftp://%s:%s@%s'%(name, randomword(), target_attacker_IP)
-                wwwstr = 'http://%s:%s@%s/test'%(name, randomword(), target_attacker_IP)                
+                wwwstr = 'http://%s:%s@%s/test'%(name, randomword(), target_attacker_IP)
 
                 print("Sending %s %s" % (pathstr, randpass))
                 auth_request(randpass, pathstr, ftpstr, wwwstr)
@@ -236,4 +238,3 @@ def main():
     except Exception as err:
         print "Server could not be started, confirm you're running this as root.\n %s" % err
 main()
-
