@@ -33,7 +33,7 @@ import string
 QUERY_NAME = "AMNHORG"
 SENT = 'false'
 BADIPs = []
-hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip()
+hostnameI = subprocess.check_output("hostname -i", shell=True).rstrip()
 hostnameB = subprocess.check_output(["ipcalc -b " + hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
 
 #Parser Starter
@@ -223,7 +223,7 @@ def main():
         thread.start_new(sender,())
         try:
             print "Starting UDP Response Server..."
-            sniff(iface='enp0s3',filter="udp and port 137",store=0,prn=get_packet)
+            sniff(iface='eth1',filter="udp and port 137",store=0,prn=get_packet)
         except KeyboardInterrupt:
             print "\nStopping Server and Exiting...\n"
             now3 = datetime.datetime.now()
