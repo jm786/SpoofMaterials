@@ -112,7 +112,7 @@ def sender():
             time.sleep(float(1))
 
 def random_username(user_type):
-    with open("names_file.txt") as f:
+    with open("last_names.txt") as f:
         names = f.read().splitlines()
     l_name = random.choice(names)
     f_name = random.choice(list(string.ascii_lowercase))
