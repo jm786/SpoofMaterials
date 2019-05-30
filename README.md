@@ -20,8 +20,8 @@ Added Flags:
 	* Send 15 users every 20 minutes
 	* When login attempted with pre-identified users, void network connection
   
-Run setup script
-Fix interface in main() function depending on configuration.
-Update iptables for host output UDP if necessary.
-Supervisorctl status 
-Use supervisorctl start spoofspotter if necessary
+Run setup script  
+Fix interface in main() function depending on configuration.  
+Update iptables for host output UDP if necessary.  
+Supervisorctl status   
+Use supervisorctl start spoofspotter if necessary  
