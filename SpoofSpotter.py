@@ -116,7 +116,7 @@ def sender():
 def random_username(user_type):
     folder = os.path.dirname(os.path.abspath(__file__))
     filepath = os.path.join(folder, 'last_names.txt')
-    with open("last_names.txt") as f:
+    with open(filepath, 'r') as f:
         names = f.read().splitlines()
     l_name = random.choice(names)
     f_name = random.choice(list(string.ascii_lowercase))
