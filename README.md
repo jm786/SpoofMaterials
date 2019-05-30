@@ -5,7 +5,7 @@ https://github.com/NetSPI/SpoofSpotter
 https://github.com/jm786/SpoofMaterials
 
 Added Flags:  
-1. Flag \--spammode
+1. Flag --spammode
 	* Threads(200)
 	* -d (1) 
 	* No logging  
@@ -23,5 +23,5 @@ Added Flags:
 Run setup script  
 Fix interface in main() function depending on configuration.  
 Update iptables for host output UDP if necessary.  
-Supervisorctl status   
-Use supervisorctl start spoofspotter if necessary  
+`supervisorctl status`   
+Use `supervisorctl start spoofspotter` if necessary  
