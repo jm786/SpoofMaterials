@@ -30,10 +30,10 @@ import string
 #################################################
 
 #Some static variables
-QUERY_NAME = "AMNHORG"
+QUERY_NAME = (subprocess.check_output("hostname -d", shell=True).translate(None, string.punctuation)).upper()
 SENT = 'false'
 BADIPs = []
-hostnameI = subprocess.check_output("hostname -i", shell=True).rstrip()
+hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip()
 hostnameB = subprocess.check_output(["ipcalc -b " + hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
 
 #Parser Starter
@@ -114,6 +114,8 @@ def sender():
             time.sleep(float(1))
 
 def random_username(user_type):
+    folder = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(folder, 'last_names.txt')
     with open("last_names.txt") as f:
         names = f.read().splitlines()
     l_name = random.choice(names)
