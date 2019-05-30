@@ -33,7 +33,8 @@ import string
 QUERY_NAME = (subprocess.check_output("hostname -d", shell=True).translate(None, string.punctuation)).upper()
 SENT = 'false'
 BADIPs = []
-hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip()[:14]
+#Show all ipaddresses independent of name resolution then pick first from list (split by space)
+hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip().split(" ")[0]
 hostnameB = subprocess.check_output(["ipcalc -b " + hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
 
 #Parser Starter
