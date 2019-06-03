@@ -220,7 +220,7 @@ def get_packet(pkt):
 
 def main():
     try:
-        hpclient = hpfeeds.new(args.g[0], args.g[1], args.g[2], spoofspotter.alerts, args.g[3])
+        hpclient = hpfeeds.new(args.g[0], args.g[1], args.g[2], 'spoofspotter.alerts', args.g[3])
         
         def on_message(identifier, channel, payload):
             print('msg', identifier, channel, payload)
