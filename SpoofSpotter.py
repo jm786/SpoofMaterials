@@ -218,7 +218,7 @@ def get_packet(pkt):
                 time.sleep(1200.0)
 
 def on_message(identifier, channel, payload):
-    print(identifier, payload)
+    print('msg', identifier, channel, payload)
 
 def on_error(payload):
     print(' --> errormessage from server: {0}'.format(payload), file=sys.stderr)
@@ -227,8 +227,6 @@ def on_error(payload):
 def main():
     try:
         hpclient = hpfeeds.new(host g.args[0], ident g.args[1], secret g.args[2], channel spoofspotter.alerts, port g.args[3])
-        hpclient.subscribe('spoofspotter.sessions')
-        hpclient.run(on_message, on_error)
 
         if args.f:
             f = open(args.f, 'a')
@@ -246,14 +244,14 @@ def main():
                 f = open(args.f, 'a')
                 f.write('Stopping Server at %s\n' %(str(now3)))
                 f.close()
-            hpclient.close()
         except Exception as err:
-            hpclient.stop()
             print ("Server could not be started, confirm you're running this as root.\n %s" % err)
     except KeyboardInterrupt:
-        hpclient.close()
         exit()
     except Exception as err:
-        hpclient.stop()
         print ("Server could not be started, confirm you're running this as root.\n %s" % err)
+    finally:
+        hpclient.subscribe('spoofspotter.sessions')
+        hpclient.run(on_message, on_error)
+        hpclient.close()
 main()
