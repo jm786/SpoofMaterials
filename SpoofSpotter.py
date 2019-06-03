@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 
+from __future__ import print_function
 import logging
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 import logging.handlers
@@ -17,7 +18,6 @@ import argparse
 import sys
 import subprocess
 from array import array
-import string
 import hpfeeds
 
 #################################################
