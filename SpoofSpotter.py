@@ -190,6 +190,7 @@ def get_packet(pkt):
                     thread_name.start()
 
         if args.R:
+            hpclient.publish('spoofspotter.alerts', b'Spoofing Attack Detected')
             target_attacker_IP = pkt.getlayer(IP).src
             print ('Sending %d hashes to %s'%(int(args.R), target_attacker_IP))
             for x in range(0, int(args.R)):
@@ -221,7 +222,6 @@ def get_packet(pkt):
 def main():
     try:
         hpclient = hpfeeds.new(args.g[0], args.g[1], args.g[2], 'spoofspotter.alerts', args.g[3])
-        
         def on_message(identifier, channel, payload):
             print('msg', identifier, channel, payload)
        
@@ -252,7 +252,5 @@ def main():
     except Exception as err:
         print ("Server could not be started, confirm you're running this as root.\n %s" % err)
     finally:
-        hpclient.subscribe('spoofspotter.sessions')
-        hpclient.run(on_message, on_error)
         hpclient.close()
 main()
