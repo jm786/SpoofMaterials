@@ -18,6 +18,7 @@ import sys
 import subprocess
 from array import array
 import string
+import hpfeeds
 
 #################################################
 # Spoof Sniffer                                 #
@@ -43,6 +44,7 @@ parser = argparse.ArgumentParser(description='A tool to catch spoofed NBNS respo
 #Required Flags
 parser.add_argument('-i', action="store", metavar='10.1.10.1', help='The IP of this host', required=False, const=hostnameI, nargs='?', default=hostnameI)
 parser.add_argument('-b', action="store", metavar='10.1.10.255', help='The Broadcast IP of this host', required=False, const=hostnameB, nargs='?', default=hostnameB)
+parser.add_argument('-g', action="store", metavar='(host,ident,secret,channel,port)', help="The registration for HPfeed", required=True, nargs='+')
 
 #Optional Flags
 parser.add_argument('-f','-F', action="store", metavar='/home/nbns.log', help='File name to save a log file')
@@ -216,8 +218,19 @@ def get_packet(pkt):
                 auth_request(randpass, pathstr, ftpstr, wwwstr)
                 time.sleep(1200.0)
 
+def on_message(identifier, channel, payload):
+    print(identifier, payload)
+
+def on_error(payload):
+    print(' --> errormessage from server: {0}'.format(payload), file=sys.stderr)
+    hpclient.stop()
+
 def main():
     try:
+        hpclient = hpfeeds.new(host g.args[0], ident g.args[1], secret g.args[2], channel spoofspotter.alerts, port g.args[3])
+        hpclient.subscribe('spoofspotter.sessions')
+        hpclient.run(on_message, on_error)
+
         if args.f:
             f = open(args.f, 'a')
             f.write('Starting Server at %s\n' %(str(now)))
@@ -234,10 +247,14 @@ def main():
                 f = open(args.f, 'a')
                 f.write('Stopping Server at %s\n' %(str(now3)))
                 f.close()
+            hpclient.close()
         except Exception as err:
+            hpclient.stop()
             print "Server could not be started, confirm you're running this as root.\n %s" % err
     except KeyboardInterrupt:
+        hpclient.close()
         exit()
     except Exception as err:
+        hpclient.stop()
         print "Server could not be started, confirm you're running this as root.\n %s" % err
 main()
