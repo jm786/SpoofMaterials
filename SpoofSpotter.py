@@ -218,16 +218,16 @@ def get_packet(pkt):
                 auth_request(randpass, pathstr, ftpstr, wwwstr)
                 time.sleep(1200.0)
 
-def on_message(identifier, channel, payload):
-    print('msg', identifier, channel, payload)
-
-def on_error(payload):
-    print(' --> errormessage from server: {0}'.format(payload), file=sys.stderr)
-    hpclient.stop()
-
 def main():
     try:
-        hpclient = hpfeeds.new(g.args[0], g.args[1], g.args[2], spoofspotter.alerts, g.args[3])
+        hpclient = hpfeeds.new(args.g[0], args.g[1], args.g[2], spoofspotter.alerts, args.g[3])
+        
+        def on_message(identifier, channel, payload):
+            print('msg', identifier, channel, payload)
+       
+        def on_error(payload):
+            print(' --> errormessage from server: {0}'.format(payload), file=sys.stderr)
+            hpclient.stop()
 
         if args.f:
             f = open(args.f, 'a')
