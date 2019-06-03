@@ -220,37 +220,35 @@ def get_packet(pkt):
                 time.sleep(1200.0)
 
 def main():
-    try:
-        hpclient = hpfeeds.new(args.g[0], args.g[1], args.g[2], 'spoofspotter.alerts', args.g[3])
-        def on_message(identifier, channel, payload):
-            print('msg', identifier, channel, payload)
+    hpclient = hpfeeds.new(args.g[0], args.g[1], args.g[2], 'spoofspotter.alerts', args.g[3])
+    def on_message(identifier, channel, payload):
+        print('msg', identifier, channel, payload)
        
-        def on_error(payload):
-            print(' --> errormessage from server: {0}'.format(payload), file=sys.stderr)
-            hpclient.stop()
-
+    def on_error(payload):
+        print(' --> errormessage from server: {0}'.format(payload), file=sys.stderr)
+        hpclient.stop()
+    if args.f:
+        f = open(args.f, 'a')
+        f.write('Starting Server at %s\n' %(str(now)))
+        f.close()
+    print ("Starting NBNS Request Thread...")
+    thread.start_new(sender,())
+    try:
+        print ("Starting UDP Response Server...")
+        sniff(iface='eth1',filter="udp and port 137",store=0,prn=get_packet)
+    except KeyboardInterrupt:
+        print ("\nStopping Server and Exiting...\n")
+        now3 = datetime.datetime.now()
         if args.f:
             f = open(args.f, 'a')
-            f.write('Starting Server at %s\n' %(str(now)))
+            f.write('Stopping Server at %s\n' %(str(now3)))
             f.close()
-        print ("Starting NBNS Request Thread...")
-        thread.start_new(sender,())
-        try:
-            print ("Starting UDP Response Server...")
-            sniff(iface='eth1',filter="udp and port 137",store=0,prn=get_packet)
-        except KeyboardInterrupt:
-            print ("\nStopping Server and Exiting...\n")
-            now3 = datetime.datetime.now()
-            if args.f:
-                f = open(args.f, 'a')
-                f.write('Stopping Server at %s\n' %(str(now3)))
-                f.close()
-        except Exception as err:
-            print ("Server could not be started, confirm you're running this as root.\n %s" % err)
-    except KeyboardInterrupt:
-        exit()
     except Exception as err:
-        print ("Server could not be started, confirm you're running this as root.\n %s" % err)
+       print ("Server could not be started, confirm you're running this as root.\n %s" % err)
+    #except KeyboardInterrupt:
+    #    exit()
+    #except Exception as err:
+    #    print ("Server could not be started, confirm you're running this as root.\n %s" % err)
     finally:
         hpclient.close()
 main()
