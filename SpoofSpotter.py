@@ -34,6 +34,7 @@ import hpfeeds
 QUERY_NAME = (subprocess.check_output("hostname -d", shell=True).translate(None, string.punctuation)).upper()
 SENT = 'false'
 BADIPs = []
+
 #Show all ipaddresses independent of name resolution then pick first from list (split by space)
 hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip().split(" ")[0]
 hostnameB = subprocess.check_output(["ipcalc -b " + hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
@@ -226,7 +227,7 @@ def on_error(payload):
 
 def main():
     try:
-        hpclient = hpfeeds.new(host g.args[0], ident g.args[1], secret g.args[2], channel spoofspotter.alerts, port g.args[3])
+        hpclient = hpfeeds.new(g.args[0], g.args[1], g.args[2], spoofspotter.alerts, g.args[3])
 
         if args.f:
             f = open(args.f, 'a')
