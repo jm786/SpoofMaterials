@@ -227,9 +227,10 @@ def main():
     try:
         try:
             hpclient = hpfeeds.new(args.g[0], args.g[1], args.g[2], 'spoofspotter.alerts', args.g[3])
+            hpclient.run(on_message, on_error)
         except hpfeeds.FeedException, e:
             print ('feed exception: %s' %e, file=sys.stderr)
-            
+
         def on_message(identifier, channel, payload):
             print('msg', identifier, channel, payload)
 
