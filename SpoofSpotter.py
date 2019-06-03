@@ -104,7 +104,7 @@ def sendEmail(REMAIL, ESERVER, IP, MAC):
     if not args.c:
         global SENT
         SENT = 'true'
-    print "Email Sent"
+    print ("Email Sent")
 
 #Sends out the queries
 def sender():
@@ -142,7 +142,7 @@ def get_packet(pkt):
         return
     if pkt.FLAGS == 0x8500:
         now2 = datetime.datetime.now()
-        print 'A spoofed NBNS response for %s was detected by %s at %s from host %s - %s' %(QUERY_NAME, args.i, str(now2), pkt.getlayer(IP).src, pkt.getlayer(Ether).src)
+        print ('A spoofed NBNS response for %s was detected by %s at %s from host %s - %s' %(QUERY_NAME, args.i, str(now2), pkt.getlayer(IP).src, pkt.getlayer(Ether).src))
         logged = 0
         for i in BADIPs:
             if i == pkt.getlayer(IP).src:
@@ -173,7 +173,7 @@ def get_packet(pkt):
 
         if args.spam:
             target_attacker_IP = pkt.getlayer(IP).src
-            print 'Sending 1000 hashes to %s'%(target_attacker_IP)
+            print ('Sending 1000 hashes to %s'%(target_attacker_IP))
             for x in range(5):
                 #Sends SMB, FTP, and WWW Auth
                 for x in range (200):
@@ -184,14 +184,13 @@ def get_packet(pkt):
                     ftpstr = 'ftp://%s:%s@%s'%(name, randomword(), target_attacker_IP)
                     wwwstr = 'http://%s:%s@%s/test'%(name, randomword(), target_attacker_IP)
 
-                    #print("Sending %s %s" % (pathstr, randpass))
                     thread_name = "thread" + str(x)
                     thread_name = threading.Thread(target=auth_request,args=(randpass, pathstr, ftpstr, wwwstr))
                     thread_name.start()
 
         if args.R:
             target_attacker_IP = pkt.getlayer(IP).src
-            print 'Sending %d hashes to %s'%(int(args.R), target_attacker_IP)
+            print ('Sending %d hashes to %s'%(int(args.R), target_attacker_IP))
             for x in range(0, int(args.R)):
                 #Sends SMB, FTP, and WWW Auth
                 name = random_username("")
@@ -205,7 +204,7 @@ def get_packet(pkt):
 
         if args.honeyuser:
             target_attacker_IP = pkt.getlayer(IP).src
-            print 'Sending %d hashes to %s'%(int(args.honeyuser), target_attacker_IP)
+            print ('Sending %d hashes to %s'%(int(args.honeyuser), target_attacker_IP))
             for x in range(0, int(args.honeyuser)):
                 #Sends SMB, FTP, and WWW Auth
                 name = random_username("honeyuser")
@@ -235,13 +234,13 @@ def main():
             f = open(args.f, 'a')
             f.write('Starting Server at %s\n' %(str(now)))
             f.close()
-        print "Starting NBNS Request Thread..."
+        print ("Starting NBNS Request Thread...")
         thread.start_new(sender,())
         try:
-            print "Starting UDP Response Server..."
+            print ("Starting UDP Response Server...")
             sniff(iface='eth1',filter="udp and port 137",store=0,prn=get_packet)
         except KeyboardInterrupt:
-            print "\nStopping Server and Exiting...\n"
+            print ("\nStopping Server and Exiting...\n")
             now3 = datetime.datetime.now()
             if args.f:
                 f = open(args.f, 'a')
@@ -250,11 +249,11 @@ def main():
             hpclient.close()
         except Exception as err:
             hpclient.stop()
-            print "Server could not be started, confirm you're running this as root.\n %s" % err
+            print ("Server could not be started, confirm you're running this as root.\n %s" % err)
     except KeyboardInterrupt:
         hpclient.close()
         exit()
     except Exception as err:
         hpclient.stop()
-        print "Server could not be started, confirm you're running this as root.\n %s" % err
+        print ("Server could not be started, confirm you're running this as root.\n %s" % err)
 main()
