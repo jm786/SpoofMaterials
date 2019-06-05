@@ -31,25 +31,26 @@ import json
 #     Twitter: @kfosaaen                        #
 #################################################
 
-#Some static variables
+# Some static variables
 QUERY_NAME = (subprocess.check_output("hostname -d", shell=True).translate(None, string.punctuation)).upper()
 SENT = 'false'
 BADIPs = []
 
-#Show all ipaddresses independent of name resolution then pick first from list (split by space)
+# Show all ipaddresses independent of name resolution
+# then pick first from list (split by space)
 hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip().split(" ")[0]
-hostnameB = subprocess.check_output(["ipcalc -b %s" %hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
-iface = subprocess.check_output("ip r | egrep '%s'" %hostnameI, shell=True).split(" ")[2]
+hostnameB = subprocess.check_output(["ipcalc -b %s" % hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
+iface = subprocess.check_output("ip r | egrep '%s'" % hostnameI, shell=True).split(" ")[2]
 
-#Parser Starter
+# Parser Starter
 parser = argparse.ArgumentParser(description='A tool to catch spoofed NBNS responses')
 
-#Required Flags
+# Required Flags
 parser.add_argument('-i', action="store", metavar='10.1.10.1', help='The IP of this host', required=False, const=hostnameI, nargs='?', default=hostnameI)
 parser.add_argument('-b', action="store", metavar='10.1.10.255', help='The Broadcast IP of this host', required=False, const=hostnameB, nargs='?', default=hostnameB)
 parser.add_argument('-g', action="store", metavar='(host,ident,secret,channel,port)', help="The registration for HPfeed", required=True, nargs='+')
 
-#Optional Flags
+# Optional Flags
 parser.add_argument('-f','-F', action="store", metavar='/home/nbns.log', help='File name to save a log file')
 parser.add_argument('-S', action="store", metavar='true', help='Log to local Syslog - this is pretty beta')
 parser.add_argument('-e', action="store", metavar='you@example.com', help='The email to receive alerts at')
@@ -62,7 +63,7 @@ parser.add_argument('--spam', action="store", metavar='true', help='Use SpoofSpo
 parser.add_argument('--honeyuser', action="store", metavar='15', help='Send known users for detection')
 args = parser.parse_args()
 
-#Handle Custom Queries
+# Handle Custom Queries
 if args.n:
     QUERY_NAME = args.n
 
@@ -73,13 +74,13 @@ def randomword():
     return "".join(random.sample(s,length))
 
 
-#Scapy broadcast packet creation
+# Scapy broadcast packet creation
 pkt = IP(src=args.i,dst=args.b)/UDP(sport=137, dport='netbios_ns')/NBNSQueryRequest(SUFFIX="file server service",QUESTION_NAME=QUERY_NAME, QUESTION_TYPE='NB')
 
-#What time is it?
+# What time is it?
 now = datetime.datetime.now()
 
-#Email function
+# Email function
 def sendEmail(REMAIL, ESERVER, IP, MAC):
     me = 'spoofspotter@netspi.com'
     you = REMAIL
@@ -101,9 +102,9 @@ def sendEmail(REMAIL, ESERVER, IP, MAC):
     s = smtplib.SMTP(server)
     s.sendmail(me, [you], msg.as_string())
     s.quit()
-    #Thanks Python Example Code
+    # Thanks Python Example Code
 
-    #Flag for preventing email spamming
+    # Flag for preventing email spamming
     if not args.c:
         global SENT
         SENT = 'true'
@@ -195,7 +196,9 @@ def get_packet(pkt):
             global hpclient
             target_attacker_IP = pkt.getlayer(IP).src
             try:
-                hpclient.publish('spoofspotter.events', json.dumps({"src_ip": str(target_attacker_IP), "dst_ip": hostnameI }))
+                if TCP in pkt:
+                    dport=pkt[TCP].dport
+                hpclient.publish('spoofspotter.events', json.dumps({"src_ip": str(target_attacker_IP), "dst_ip": hostnameI , "dst_port": dport}))
             except Exception as e:
                 print ('feed exception: %s' %e)
 
