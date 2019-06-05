@@ -194,7 +194,7 @@ def get_packet(pkt):
             global hpclient
             target_attacker_IP = pkt.getlayer(IP).src
             try:
-                hpclient.publish('spoofspotter.events', json.dumps({"src_ip": str(target_attacker_IP), "dst_i": "2.1.12.1" }))
+                hpclient.publish('spoofspotter.events', json.dumps({"src_ip": "1.1.1.7", "dst_ip": "2.1.12.1" }))
             except Exception as e:
                 print ('feed exception: %s' %e)
 
