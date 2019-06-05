@@ -192,11 +192,10 @@ def get_packet(pkt):
 
         if args.R:
             target_attacker_IP = pkt.getlayer(IP).src
-
             try:
                 hpclient.publish('spoofspotter.alerts', json.dumps({"src_ip": str(target_attacker_IP), "dst_i": "2.1.12.1" }))
-            except hpfeeds.FeedException, e:
-                print ('feed exception: %s' %e, file=sys.stderr)
+            except Exception as e:
+                print ('feed exception: %s' %e)
 
             print ('Sending %d hashes to %s'%(int(args.R), target_attacker_IP))
             for x in range(0, int(args.R)):
@@ -227,10 +226,7 @@ def get_packet(pkt):
 
 def main():
     try:
-        try:
-            hpclient = hpfeeds.new(args.g[0], 10000, args.g[1], args.g[2])
-        except Exception as e:
-            print ('feed exception: %s' %e)
+        hpclient = hpfeeds.new(args.g[0], 10000, args.g[1], args.g[2])
 
         if args.f:
             f = open(args.f, 'a')
