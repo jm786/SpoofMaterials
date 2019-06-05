@@ -38,7 +38,8 @@ BADIPs = []
 
 #Show all ipaddresses independent of name resolution then pick first from list (split by space)
 hostnameI = subprocess.check_output("hostname -I", shell=True).rstrip().split(" ")[0]
-hostnameB = subprocess.check_output(["ipcalc -b " + hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
+hostnameB = subprocess.check_output(["ipcalc -b %s" %hostnameI.rstrip()+"/24"], shell=True).rstrip()[10:]
+iface = subprocess.check_output("ip r | egrep '%s'" %hostnameI, shell=True).split(" ")[2]
 
 #Parser Starter
 parser = argparse.ArgumentParser(description='A tool to catch spoofed NBNS responses')
@@ -194,7 +195,7 @@ def get_packet(pkt):
             global hpclient
             target_attacker_IP = pkt.getlayer(IP).src
             try:
-                hpclient.publish('spoofspotter.events', json.dumps({"src_ip": str(target_attacker_IP), "dst_ip": "2.1.12.1" }))
+                hpclient.publish('spoofspotter.events', json.dumps({"src_ip": str(target_attacker_IP), "dst_ip": hostnameI }))
             except Exception as e:
                 print ('feed exception: %s' %e)
 
@@ -238,7 +239,7 @@ def main():
         thread.start_new(sender,())
         try:
             print ("Starting UDP Response Server...")
-            sniff(iface='enp0s3',filter="udp and port 137",store=0,prn=get_packet)
+            sniff(iface=iface,filter="udp and port 137",store=0,prn=get_packet)
         except KeyboardInterrupt:
             print ("\nStopping Server and Exiting...\n")
             now3 = datetime.datetime.now()
