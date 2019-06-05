@@ -199,6 +199,8 @@ def get_packet(pkt):
             try:
                 if TCP in pkt:
                     dport=pkt[TCP].dport
+                else:
+                    dport=80
                 hpclient.publish('spoofspotter.events', json.dumps({"src_ip": str(target_attacker_IP), "dst_ip": hostnameI , "dst_port": dport}))
             except Exception as e:
                 print ('feed exception: %s' %e)
