@@ -238,7 +238,7 @@ def main():
         thread.start_new(sender,())
         try:
             print ("Starting UDP Response Server...")
-            sniff(iface='eth1',filter="udp and port 137",store=0,prn=get_packet)
+            sniff(iface='enp0s3',filter="udp and port 137",store=0,prn=get_packet)
         except KeyboardInterrupt:
             print ("\nStopping Server and Exiting...\n")
             now3 = datetime.datetime.now()
