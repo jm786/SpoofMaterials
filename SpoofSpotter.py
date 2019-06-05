@@ -191,6 +191,7 @@ def get_packet(pkt):
                     thread_name.start()
 
         if args.R:
+            global hpclient
             target_attacker_IP = pkt.getlayer(IP).src
             try:
                 hpclient.publish('spoofspotter.events', json.dumps({"src_ip": str(target_attacker_IP), "dst_i": "2.1.12.1" }))
@@ -225,6 +226,7 @@ def get_packet(pkt):
                 time.sleep(1200.0)
 
 def main():
+    global hpclient
     try:
         hpclient = hpfeeds.new(args.g[0], 10000, args.g[1], args.g[2])
 
@@ -236,7 +238,7 @@ def main():
         thread.start_new(sender,())
         try:
             print ("Starting UDP Response Server...")
-            sniff(iface='enp0s3',filter="udp and port 137",store=0,prn=get_packet)
+            sniff(iface='eth1',filter="udp and port 137",store=0,prn=get_packet)
         except KeyboardInterrupt:
             print ("\nStopping Server and Exiting...\n")
             now3 = datetime.datetime.now()
