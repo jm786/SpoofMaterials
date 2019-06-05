@@ -194,6 +194,7 @@ def get_packet(pkt):
 
         if args.R:
             global hpclient
+            global dport
             target_attacker_IP = pkt.getlayer(IP).src
             try:
                 if TCP in pkt:
