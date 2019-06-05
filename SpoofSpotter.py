@@ -19,6 +19,7 @@ import sys
 import subprocess
 from array import array
 import hpfeeds
+import json
 
 #################################################
 # Spoof Sniffer                                 #
