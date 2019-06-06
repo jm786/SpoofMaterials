@@ -21,7 +21,6 @@ Added Flags:
 	* When login attempted with pre-identified users, void network connection
   
 Run setup script.  
-Fix interface in main() function depending on configuration.  
 Update iptables for host output UDP if necessary.  
 `supervisorctl status`   
 Use `supervisorctl start spoofspotter` if necessary.
